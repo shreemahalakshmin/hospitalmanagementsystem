@@ -1,6 +1,8 @@
 package com.example.hospitalmanagementsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.hospitalmanagementsystem.entity.Appointment;
@@ -33,16 +35,25 @@ public class AppointmentController {
 
     // Book an appointment
    @PostMapping("/book")
-    public Appointment bookAppointment(@RequestBody AppointmentRequest request) {
-    // Fetch patient and slot based on request data
-    User patient = userRepository.findById(request.getPatientId())
-            .orElseThrow(() -> new RuntimeException("Patient not found"));
+public ResponseEntity<?> bookAppointment(@RequestBody AppointmentRequest request) {
+    try {
+        User patient = userRepository.findById(request.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
-    AvailabilitySlot slot = availabilitySlotRepository.findById(request.getSlotId())
-            .orElseThrow(() -> new RuntimeException("Slot not found"));
+        AvailabilitySlot slot = availabilitySlotRepository.findById(request.getSlotId())
+                .orElseThrow(() -> new RuntimeException("Slot not found"));
 
-    return appointmentService.bookAppointment(patient, slot);
+        Appointment appointment = appointmentService.bookAppointment(patient, slot);
+
+        return ResponseEntity.ok(appointment); // Return 200 OK with the appointment data
+    } catch (RuntimeException e) {
+        // Log error details
+        System.out.println("Error while booking appointment: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error: " + e.getMessage());  // Return 500 with error message
+    }
 }
+
 
 
     // Doctor confirms an appointment

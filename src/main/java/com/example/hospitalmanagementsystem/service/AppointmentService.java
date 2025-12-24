@@ -24,12 +24,13 @@ public class AppointmentService {
     @Autowired
     private AvailabilitySlotRepository availabilitySlotRepository;
 
-    @Transactional
-    public Appointment bookAppointment(User patient, AvailabilitySlot slot) {
-        if (patient == null || slot == null) {
-            throw new RuntimeException("Patient or Slot is missing");
-        }
+   @Transactional
+public Appointment bookAppointment(User patient, AvailabilitySlot slot) {
+    if (patient == null || slot == null) {
+        throw new RuntimeException("Patient or Slot is missing");
+    }
 
+    try {
         if (!slot.isBooked()) {
             slot.setBooked(true); 
             availabilitySlotRepository.save(slot);  // Save the updated slot
@@ -41,11 +42,17 @@ public class AppointmentService {
             appointment.setStatus(AppointmentStatus.PENDING);
             appointment.setBookedTime(LocalDateTime.now());
 
-            return appointmentRepository.save(appointment);  // Save the new appointment
+            return appointmentRepository.save(appointment);  
         } else {
             throw new RuntimeException("This slot is already booked");
         }
+    } catch (Exception e) {
+       
+        e.printStackTrace();
+        throw new RuntimeException("Error occurred while booking appointment: " + e.getMessage());
     }
+}
+
 
     public Appointment confirmAppointment(Long appointmentId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
