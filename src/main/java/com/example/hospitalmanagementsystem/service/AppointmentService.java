@@ -66,4 +66,16 @@ public class AppointmentService {
     public List<Appointment> getPendingAppointments(Doctor doctor) {
         return appointmentRepository.findByDoctorAndStatus(doctor, AppointmentStatus.PENDING);
     }
+    public AppointmentStatus getAppointmentStatus(Long appointmentId, Long patientId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        // Check if the given patientId matches the one in the appointment
+        if (!appointment.getPatient().getUserId().equals(patientId)) {
+            throw new RuntimeException("You are not authorized to view this appointment's status.");
+        }
+
+        // Return the status of the appointment
+        return appointment.getStatus();
+    }
 }
