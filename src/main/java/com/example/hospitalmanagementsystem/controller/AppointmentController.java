@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.hospitalmanagementsystem.entity.Appointment;
+import com.example.hospitalmanagementsystem.entity.AppointmentStatus;
 import com.example.hospitalmanagementsystem.entity.User;
 import com.example.hospitalmanagementsystem.entity.AvailabilitySlot;
 import com.example.hospitalmanagementsystem.entity.Doctor;
@@ -71,26 +72,57 @@ public class AppointmentController {
 
     // Get pending appointments for a doctor
     @GetMapping("/pending/{doctorId}")
-public ResponseEntity<?> getPendingAppointments(@PathVariable Long doctorId) {
-    try {
-        Doctor doctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+    public ResponseEntity<?> getPendingAppointments(@PathVariable Long doctorId) {
+        try {
+            Doctor doctor = doctorRepository.findById(doctorId)
+                    .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        List<Appointment> pendingAppointments = appointmentService.getPendingAppointments(doctor);
+            List<Appointment> pendingAppointments = appointmentService.getPendingAppointments(doctor);
 
-        if (pendingAppointments.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body("No pending appointments found.");
+            if (pendingAppointments.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body("No pending appointments found.");
+            }
+
+            return ResponseEntity.ok(pendingAppointments);  // Return 200 OK with the list of pending appointments
+        } catch (RuntimeException e) {
+            // Log error details
+            System.out.println("Error while fetching pending appointments: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error: " + e.getMessage());  // Return 400 Bad Request
         }
-
-        return ResponseEntity.ok(pendingAppointments);  // Return 200 OK with the list of pending appointments
-    } catch (RuntimeException e) {
-        // Log error details
-        System.out.println("Error while fetching pending appointments: " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Error: " + e.getMessage());  // Return 400 Bad Request
     }
-}
 
+    // Get appointment details for a patient
+    @GetMapping("/details/{appointmentId}")
+    public ResponseEntity<?> getAppointmentDetails(@PathVariable Long appointmentId, @RequestParam Long patientId) {
+        try {
+            // Fetch the appointment details for the patient
+            Appointment appointment = appointmentService.getAppointmentDetails(appointmentId, patientId);
 
+            // Return 200 OK with the appointment details
+            return ResponseEntity.ok(appointment);
+        } catch (RuntimeException e) {
+            // Log error details
+            System.out.println("Error while fetching appointment details: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error: " + e.getMessage());  // Return 400 Bad Request
+        }
+    }
+
+    // Get appointment status for a patient
+    @GetMapping("/status/{appointmentId}")
+    public ResponseEntity<?> getAppointmentStatus(@PathVariable Long appointmentId, @RequestParam Long patientId) {
+        try {
+            // Fetch the appointment status for the patient
+            AppointmentStatus status = appointmentService.getAppointmentStatus(appointmentId, patientId);
+
+            return ResponseEntity.ok(status); // Return the status of the appointment
+        } catch (RuntimeException e) {
+            // Log error details
+            System.out.println("Error while fetching appointment status: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error: " + e.getMessage());  // Return 400 Bad Request
+        }
+    }
 }
