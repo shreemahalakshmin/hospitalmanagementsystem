@@ -1,0 +1,39 @@
+GET DOCTOR BY SPECIALIZATION:
+Method: GET
+URL Example: http://localhost:8081/api/doctors/search?specialization=Cardiology
+------------------------------------------------------------------------------
+GET BY SPECIFIC DOCTOR'S SLOTS
+Method: GET
+URL Example: http://localhost:8081/api/doctors/2/available-slots
+-------------------------------------------------------------------------------
+GET DOCTOR BY SPECIALIZATION AND DOCTOR NAME
+Method: GET
+URL Example: http://localhost:8081/api/doctors/search?specialization=Cardiology&name=John
+------------------------------------------------------------------------
+BOOK APPOINTMENT:
+Method: POST
+
+URL: http://localhost:8081/api/appointments/book
+
+JSON Request Body:
+
+    {
+    "patientId": 1,
+    "slotId": 2
+    }
+-------------------------------------------------------------------------
+DOCTOR GET PENDING APPOINTMENT:(FOR THAT DOCTOR)
+Method: GET
+URL Example: http://localhost:8081/api/appointments/pending/1
+------------------------------------------------------------------------
+CONFIRM APPOINTMENT:
+Method: PUT
+URL Example: http://localhost:8081/api/appointments/confirm/10
+-------------------------------------------------------------------------
+PATIENT GET THIER APPOINTMENT DETAILS
+Method: GET
+URL Example: http://localhost:8081/api/appointments/details/10?patientId=1
+----------------------------------------------------------------------------
+ET STATUS OF THE APPOINTMENT:
+Method: GET
+URL Example: http://localhost:8081/api/appointments/status/10?patientId=1
